@@ -8,13 +8,17 @@ import (
 
 const sendInterval = time.Second
 
-type OBUData struct {
-	OBUID int     `json:"obuID"`
-	Lat   float64 `json:"lat"`
-	Long  float64 `json:"long"`
+type OBU struct {
+	ID   uint64 `json:"id"`
+	Lat  Coord  `json:"lat"`
+	Long Coord  `json:"long"`
 }
 
 type Coord float64
+
+func generateOBUID() uint64 {
+	return rand.Uint64()
+}
 
 func generateCoord() Coord {
 	return Coord(rand.Float64() * 100)
@@ -27,7 +31,13 @@ func generateLocation() (Coord, Coord) {
 func main() {
 
 	for {
-		fmt.Println(generateLocation())
+		lat, long := generateLocation()
+		obu := OBU{
+			ID:   generateOBUID(),
+			Lat:  lat,
+			Long: long,
+		}
+		fmt.Printf("%+v\n", obu)
 		time.Sleep(sendInterval)
 	}
 
