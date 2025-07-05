@@ -15,10 +15,12 @@ func main() {
 	u := url.URL{Scheme: "ws", Host: *addr, Path: "/ws"}
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("dial: ", err)
+		log.Fatal("dial failed: ", err)
+		return
 	}
 	defer conn.Close()
-	fmt.Println("data receiver is ready")
+
+	fmt.Println("Connected to OBU sender server")
 
 	for {
 		_, msg, err := conn.ReadMessage()
