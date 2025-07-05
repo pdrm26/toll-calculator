@@ -4,27 +4,21 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/pdrm26/toll-calculator/types"
 )
 
 const sendInterval = time.Second
-
-type OBU struct {
-	ID   uint64 `json:"id"`
-	Lat  Coord  `json:"lat"`
-	Long Coord  `json:"long"`
-}
-
-type Coord float64
 
 func generateOBUID() uint64 {
 	return rand.Uint64()
 }
 
-func generateCoord() Coord {
-	return Coord(rand.Float64() * 100)
+func generateCoord() types.Coord {
+	return types.Coord(rand.Float64() * 100)
 }
 
-func generateLocation() (Coord, Coord) {
+func generateLocation() (types.Coord, types.Coord) {
 	return generateCoord(), generateCoord()
 }
 
@@ -32,7 +26,7 @@ func main() {
 
 	for {
 		lat, long := generateLocation()
-		obu := OBU{
+		obu := types.OBU{
 			ID:   generateOBUID(),
 			Lat:  lat,
 			Long: long,
