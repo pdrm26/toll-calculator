@@ -42,8 +42,9 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 			Lat:  lat,
 			Long: long,
 		}
-		marshalOBU, _ := json.Marshal(obu)
-		conn.WriteMessage(websocket.TextMessage, marshalOBU)
+		if err := o.conn.WriteJSON(obu); err != nil {
+			log.Fatal("Send error:", err)
+		}
 		time.Sleep(sendInterval)
 	}
 

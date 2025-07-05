@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/gorilla/websocket"
+	"github.com/pdrm26/toll-calculator/types"
 )
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
@@ -23,12 +24,12 @@ func main() {
 	fmt.Println("Connected to OBU sender server")
 
 	for {
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
+		var obuData types.OBU
+		if err := conn.ReadJSON(&obuData); err != nil {
 			log.Println("Read error:", err)
 			break
 		}
-		log.Printf("Received: %s", msg)
+		fmt.Printf("Received: %+v\n", obuData)
 	}
 
 }
