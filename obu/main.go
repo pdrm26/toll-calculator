@@ -13,8 +13,12 @@ import (
 
 const sendInterval = time.Second
 
-func generateOBUID() uint64 {
-	return rand.Uint64()
+type OBUSender struct {
+	conn *websocket.Conn
+}
+
+func generateOBUID() int {
+	return rand.Intn(math.MaxInt)
 }
 
 func generateCoord() types.Coord {
