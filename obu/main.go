@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
 	"time"
@@ -31,14 +31,19 @@ func generateLocation() (types.Coord, types.Coord) {
 	return generateCoord(), generateCoord()
 }
 
-func serveWS(w http.ResponseWriter, r *http.Request) {
+func (o *OBUSender) handleWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal("Upgrade failed: ", err)
 		return
 	}
 	defer conn.Close()
+	o.conn = conn
 
+	o.handleOBUSender()
+}
+
+func (o *OBUSender) handleOBUSender() {
 	for {
 		lat, long := generateLocation()
 		obu := types.OBU{
@@ -51,11 +56,11 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 		}
 		time.Sleep(sendInterval)
 	}
-
 }
 
 func main() {
-	http.HandleFunc("/ws", serveWS)
+	obuSender := OBUSender{}
+	http.HandleFunc("/ws", obuSender.handleWS)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }
