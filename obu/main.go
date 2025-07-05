@@ -1,10 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"math/rand"
+	"net/http"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/pdrm26/toll-calculator/types"
 )
 
@@ -18,11 +21,19 @@ func generateCoord() types.Coord {
 	return types.Coord(rand.Float64() * 100)
 }
 
+var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+
 func generateLocation() (types.Coord, types.Coord) {
 	return generateCoord(), generateCoord()
 }
 
-func main() {
+func serveWS(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal("Upgrade failed: ", err)
+		return
+	}
+	defer conn.Close()
 
 	for {
 		lat, long := generateLocation()
@@ -31,8 +42,15 @@ func main() {
 			Lat:  lat,
 			Long: long,
 		}
-		fmt.Printf("%+v\n", obu)
+		marshalOBU, _ := json.Marshal(obu)
+		conn.WriteMessage(websocket.TextMessage, marshalOBU)
 		time.Sleep(sendInterval)
 	}
+
+}
+
+func main() {
+	http.HandleFunc("/ws", serveWS)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }
