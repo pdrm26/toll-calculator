@@ -19,30 +19,32 @@ func NewOBUReceiver() (*OBUReceiver, error) {
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 
-func (or *OBUReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
+func (or *OBUReceiver) wsReceiveLoop() {
+	fmt.Println("New OBU connected client connected!")
+
+	for {
+		var obu types.OBU
+		if err := or.conn.ReadJSON(&obu); err != nil {
+			log.Println("Read error:", err)
+			break
+		}
+		fmt.Printf("Received: %+v\n", obu)
+	}
+}
+
+func handleWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal("Upgrade failed: ", err)
 		return
 	}
 	defer conn.Close()
-	or.conn = conn
-	for {
-		var obuData types.OBU
-		if err := conn.ReadJSON(&obuData); err != nil {
-			log.Println("Read error:", err)
-			break
-		}
-		fmt.Printf("Received: %+v\n", obuData)
-	}
+
+	receiver := &OBUReceiver{conn: conn}
+	receiver.wsReceiveLoop()
 }
 
 func main() {
-	recv, err := NewOBUReceiver()
-	if err != nil {
-		log.Fatal(err)
-	}
-	http.HandleFunc("/ws", recv.handleWS)
+	http.HandleFunc("/ws", handleWS)
 	log.Fatal(http.ListenAndServe(":3000", nil))
-
 }
