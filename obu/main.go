@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
-	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -13,9 +15,7 @@ import (
 
 const sendInterval = time.Second
 
-type OBUSender struct {
-	conn *websocket.Conn
-}
+var addr = flag.String("addr", "localhost:3000", "http service address")
 
 func generateOBUID() int {
 	return rand.Intn(math.MaxInt)
@@ -25,25 +25,21 @@ func generateCoord() types.Coord {
 	return types.Coord(rand.Float64() * 100)
 }
 
-var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
-
 func generateLocation() (types.Coord, types.Coord) {
 	return generateCoord(), generateCoord()
 }
 
-func (o *OBUSender) handleWS(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+func main() {
+	u := url.URL{Scheme: "ws", Host: *addr, Path: "/ws"}
+	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("Upgrade failed: ", err)
+		log.Fatal("dial failed: ", err)
 		return
 	}
 	defer conn.Close()
-	o.conn = conn
 
-	o.handleOBUSender()
-}
+	fmt.Println("Connected to OBU receiver server")
 
-func (o *OBUSender) handleOBUSender() {
 	for {
 		lat, long := generateLocation()
 		obu := types.OBU{
@@ -51,16 +47,9 @@ func (o *OBUSender) handleOBUSender() {
 			Lat:  lat,
 			Long: long,
 		}
-		if err := o.conn.WriteJSON(obu); err != nil {
+		if err := conn.WriteJSON(obu); err != nil {
 			log.Fatal("Send error:", err)
 		}
 		time.Sleep(sendInterval)
 	}
-}
-
-func main() {
-	obuSender := OBUSender{}
-	http.HandleFunc("/ws", obuSender.handleWS)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-
 }
