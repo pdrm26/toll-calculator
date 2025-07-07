@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,10 @@ import (
 	"github.com/pdrm26/toll-calculator/types"
 )
 
+var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+
+var kafkaTopic string = "obudata"
+
 type OBUReceiver struct {
 	msgch    chan types.OBU
 	conn     *websocket.Conn
@@ -17,12 +22,42 @@ type OBUReceiver struct {
 }
 
 func NewOBUReceiver() (*OBUReceiver, error) {
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
+	if err != nil {
+		return nil, err
+	}
+	// Delivery report handler for produced messages
+	go func() {
+		for e := range p.Events() {
+			switch ev := e.(type) {
+			case *kafka.Message:
+				if ev.TopicPartition.Error != nil {
+					fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
+				} else {
+					fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
+				}
+			}
+		}
+	}()
 	return &OBUReceiver{
-		msgch: make(chan types.OBU, 10),
+		msgch:    make(chan types.OBU, 10),
+		producer: p,
 	}, nil
 }
 
-var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
+func (or *OBUReceiver) producetData(data types.OBU) error {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	err = or.producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &kafkaTopic, Partition: kafka.PartitionAny},
+		Value:          b,
+	}, nil)
+
+	return err
+}
 
 func (or *OBUReceiver) wsReceiveLoop() {
 	fmt.Println("New OBU connected client connected!")
@@ -33,8 +68,9 @@ func (or *OBUReceiver) wsReceiveLoop() {
 			log.Println("Read error:", err)
 			break
 		}
-		or.msgch <- obu
-		fmt.Printf("Received: %+v\n", <-or.msgch)
+		if err := or.producetData(obu); err != nil {
+			fmt.Println("kafka produce error:", err)
+		}
 	}
 }
 
@@ -51,32 +87,6 @@ func (or *OBUReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
-	if err != nil {
-		panic(err)
-	}
-	defer p.Close()
-
-	// Delivery report handler for produced messages
-	go func() {
-		for e := range p.Events() {
-			switch ev := e.(type) {
-			case *kafka.Message:
-				if ev.TopicPartition.Error != nil {
-					fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
-				} else {
-					fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
-				}
-			}
-		}
-
-	}()
-	topic := "obudata"
-	p.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-		Value:          []byte("woooww"),
-	}, nil)
-
 	rec, err := NewOBUReceiver()
 	if err != nil {
 		log.Fatal(err)
