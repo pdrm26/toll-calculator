@@ -13,9 +13,10 @@ type DataProducer interface {
 
 type KafkaProducer struct {
 	producer *kafka.Producer
+	topic    string
 }
 
-func NewKafkaProducer() (DataProducer, error) {
+func NewKafkaProducer(kafkaTopic string) (DataProducer, error) {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
 	if err != nil {
 		return nil, err
@@ -35,6 +36,7 @@ func NewKafkaProducer() (DataProducer, error) {
 	// }()
 	return &KafkaProducer{
 		producer: p,
+		topic:    kafkaTopic,
 	}, nil
 }
 
@@ -45,7 +47,7 @@ func (k *KafkaProducer) ProduceData(data types.OBU) error {
 	}
 
 	return k.producer.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: &kafkaTopic, Partition: kafka.PartitionAny},
+		TopicPartition: kafka.TopicPartition{Topic: &k.topic, Partition: kafka.PartitionAny},
 		Value:          b,
 	}, nil)
 }

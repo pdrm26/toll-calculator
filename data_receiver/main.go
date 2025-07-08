@@ -11,8 +11,6 @@ import (
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 
-var kafkaTopic string = "obudata"
-
 type OBUReceiver struct {
 	msgch    chan types.OBU
 	conn     *websocket.Conn
@@ -20,7 +18,7 @@ type OBUReceiver struct {
 }
 
 func NewOBUReceiver() (*OBUReceiver, error) {
-	p, err := NewKafkaProducer()
+	p, err := NewKafkaProducer("obudata")
 	if err != nil {
 		return nil, err
 	}
