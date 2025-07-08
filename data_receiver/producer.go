@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/pdrm26/toll-calculator/types"
@@ -16,24 +15,24 @@ type KafkaProducer struct {
 	producer *kafka.Producer
 }
 
-func NewKafkaProducer() (*KafkaProducer, error) {
+func NewKafkaProducer() (DataProducer, error) {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
 	if err != nil {
 		return nil, err
 	}
 	// Delivery report handler for produced messages
-	go func() {
-		for e := range p.Events() {
-			switch ev := e.(type) {
-			case *kafka.Message:
-				if ev.TopicPartition.Error != nil {
-					fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
-				} else {
-					fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
-				}
-			}
-		}
-	}()
+	// go func() {
+	// 	for e := range p.Events() {
+	// 		switch ev := e.(type) {
+	// 		case *kafka.Message:
+	// 			if ev.TopicPartition.Error != nil {
+	// 				fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
+	// 			} else {
+	// 				fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
+	// 			}
+	// 		}
+	// 	}
+	// }()
 	return &KafkaProducer{
 		producer: p,
 	}, nil

@@ -24,6 +24,7 @@ func NewOBUReceiver() (*OBUReceiver, error) {
 	if err != nil {
 		return nil, err
 	}
+	p = NewLogMiddleware(p)
 	return &OBUReceiver{
 		msgch:    make(chan types.OBU, 10),
 		producer: p,
