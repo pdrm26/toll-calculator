@@ -1,5 +1,15 @@
 package main
 
+import (
+	"log"
+)
+
 func main() {
-	println("distance calculator service.")
+	kafkaConsumer, err := NewkafkaConsumer()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	kafkaConsumer.Start()
+
 }
