@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	kafkaConsumer, err := NewkafkaConsumer()
+	kafkaConsumer, err := NewkafkaConsumer("obudata")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -11,10 +11,11 @@ import (
 
 type KafkaConsumer struct {
 	consumer  *kafka.Consumer
+	topic     string
 	isRunning bool // A signal handler or similar could be used to set this to false to break the loop.
 }
 
-func NewkafkaConsumer() (*KafkaConsumer, error) {
+func NewkafkaConsumer(kafkaTopic string) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
 		"group.id":          "myGroup",
@@ -24,13 +25,14 @@ func NewkafkaConsumer() (*KafkaConsumer, error) {
 		return nil, err
 	}
 
-	err = c.SubscribeTopics([]string{"myTopic", "^aRegex.*[Tt]opic"}, nil)
+	err = c.SubscribeTopics([]string{kafkaTopic}, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	return &KafkaConsumer{
 		consumer: c,
+		topic:    kafkaTopic,
 	}, nil
 }
 
