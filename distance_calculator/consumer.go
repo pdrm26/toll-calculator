@@ -36,6 +36,7 @@ func NewkafkaConsumer() (*KafkaConsumer, error) {
 
 func (c *KafkaConsumer) Start() {
 	logrus.Info("Kafka consumer started")
+	c.isRunning = true
 	c.readMessageLoop()
 }
 
