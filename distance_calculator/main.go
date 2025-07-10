@@ -5,7 +5,8 @@ import (
 )
 
 func main() {
-	kafkaConsumer, err := NewkafkaConsumer("obudata")
+	service := NewCalculateService()
+	kafkaConsumer, err := NewkafkaConsumer("obudata", service)
 	if err != nil {
 		log.Fatal(err)
 	}

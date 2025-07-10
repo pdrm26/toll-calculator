@@ -1,20 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/pdrm26/toll-calculator/types"
 	"github.com/sirupsen/logrus"
 )
 
 type KafkaConsumer struct {
-	consumer  *kafka.Consumer
-	topic     string
-	isRunning bool // A signal handler or similar could be used to set this to false to break the loop.
+	consumer    *kafka.Consumer
+	topic       string
+	isRunning   bool // A signal handler or similar could be used to set this to false to break the loop.
+	calcService *CalculateService
 }
 
-func NewkafkaConsumer(kafkaTopic string) (*KafkaConsumer, error) {
+func NewkafkaConsumer(kafkaTopic string, service *CalculateService) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
 		"group.id":          "myGroup",
@@ -30,8 +33,9 @@ func NewkafkaConsumer(kafkaTopic string) (*KafkaConsumer, error) {
 	}
 
 	return &KafkaConsumer{
-		consumer: c,
-		topic:    kafkaTopic,
+		consumer:    c,
+		topic:       kafkaTopic,
+		calcService: service,
 	}, nil
 }
 
@@ -47,6 +51,17 @@ func (c *KafkaConsumer) readMessageLoop() {
 		if err != nil {
 			log.Println("Kafka consumer error: ", err)
 		}
-		fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+
+		var obu *types.OBU
+		if err := json.Unmarshal(msg.Value, &obu); err != nil {
+			logrus.Errorf("JSON serialization error: %s", err)
+		}
+
+		distance, err := c.calcService.CalculateDistance(obu)
+		if err != nil {
+			logrus.Errorf("distance calculation error: %s", err)
+		}
+
+		fmt.Printf("distance %.2f\n", distance)
 	}
 }
