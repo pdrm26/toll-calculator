@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/sirupsen/logrus"
@@ -44,19 +43,10 @@ func (c *KafkaConsumer) Start() {
 
 func (c *KafkaConsumer) readMessageLoop() {
 	for c.isRunning {
-		msg, err := c.consumer.ReadMessage(time.Second)
+		msg, err := c.consumer.ReadMessage(-1)
 		if err != nil {
 			log.Println("Kafka consumer error: ", err)
 		}
-		if err == nil {
-			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-		} else if !err.(kafka.Error).IsTimeout() {
-			// The client will automatically try to recover from all errors.
-			// Timeout is not considered an error because it is raised by
-			// ReadMessage in absence of messages.
-			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
-		}
-
-		fmt.Println(msg)
+		fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 	}
 }
