@@ -5,7 +5,8 @@ import (
 )
 
 func main() {
-	service := NewCalculateService()
+	service := NewCalculatorService()
+	service = NewLogMiddleware(service)
 	kafkaConsumer, err := NewkafkaConsumer("obudata", service)
 	if err != nil {
 		log.Fatal(err)

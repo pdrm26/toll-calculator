@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
@@ -14,10 +13,10 @@ type KafkaConsumer struct {
 	consumer    *kafka.Consumer
 	topic       string
 	isRunning   bool // A signal handler or similar could be used to set this to false to break the loop.
-	calcService *CalculateService
+	calcService CalculatorServicer
 }
 
-func NewkafkaConsumer(kafkaTopic string, service *CalculateService) (*KafkaConsumer, error) {
+func NewkafkaConsumer(kafkaTopic string, service CalculatorServicer) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
 		"group.id":          "myGroup",
@@ -52,16 +51,16 @@ func (c *KafkaConsumer) readMessageLoop() {
 			log.Println("Kafka consumer error: ", err)
 		}
 
-		var obu *types.OBU
+		var obu types.OBU
 		if err := json.Unmarshal(msg.Value, &obu); err != nil {
 			logrus.Errorf("JSON serialization error: %s", err)
 		}
 
-		distance, err := c.calcService.CalculateDistance(obu)
+		_, err = c.calcService.CalculateDistance(obu)
 		if err != nil {
 			logrus.Errorf("distance calculation error: %s", err)
 		}
 
-		fmt.Printf("distance %.2f\n", distance)
+		// fmt.Printf("distance %.2f\n", distance)
 	}
 }

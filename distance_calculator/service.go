@@ -6,17 +6,17 @@ import (
 	"github.com/pdrm26/toll-calculator/types"
 )
 
-type calculatorServicer interface {
+type CalculatorServicer interface {
 	CalculateDistance(types.OBU) (float64, error)
 }
 
-type CalculateService struct{}
+type CalculatorService struct{}
 
-func NewCalculateService() *CalculateService {
-	return &CalculateService{}
+func NewCalculatorService() CalculatorServicer {
+	return &CalculatorService{}
 }
 
-func (s *CalculateService) CalculateDistance(data *types.OBU) (float64, error) {
+func (s *CalculatorService) CalculateDistance(data types.OBU) (float64, error) {
 	distance, err := calculateDistance(float64(data.Lat), float64(data.Long))
 	if err != nil {
 		return 0.0, err
