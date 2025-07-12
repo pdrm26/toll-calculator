@@ -6,3 +6,9 @@ type OBU struct {
 	Lat  Coord `json:"lat"`
 	Long Coord `json:"long"`
 }
+
+type Distance struct {
+	OBUID     string  `json:"obuID"`
+	Timestamp int64   `json:"timestamp"`
+	Value     float64 `json:"value"`
+}
