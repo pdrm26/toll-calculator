@@ -43,6 +43,7 @@ func main() {
 
 	store := NewMemoryStore()
 	service := NewInvoiceAggregator(store)
+	service = NewLogMiddleware(service)
 
 	makeHTTPTransport(*listenAddr, service)
 }
