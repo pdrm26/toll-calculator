@@ -38,7 +38,7 @@ func makeHTTPTransport(listenAddr string, service Aggregator) {
 }
 
 func main() {
-	listenAddr := flag.String("listenAddr", ":3000", "http server listen address")
+	listenAddr := flag.String("listenAddr", ":8000", "http server listen address")
 	flag.Parse()
 
 	store := NewMemoryStore()
