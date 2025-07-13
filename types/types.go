@@ -8,7 +8,7 @@ type OBU struct {
 }
 
 type Distance struct {
-	OBUID     string  `json:"obuID"`
+	OBUID     int  `json:"obuID"`
 	Timestamp int64   `json:"timestamp"`
 	Value     float64 `json:"value"`
 }
