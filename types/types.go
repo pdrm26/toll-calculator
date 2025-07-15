@@ -8,7 +8,13 @@ type OBU struct {
 }
 
 type Distance struct {
-	OBUID     int  `json:"obuID"`
+	OBUID     int     `json:"obuID"`
 	Timestamp int64   `json:"timestamp"`
 	Value     float64 `json:"value"`
+}
+
+type Invoice struct {
+	OBUID         int     `json:"obuID"`
+	TotalDistance float64 `json:"totalDistance"`
+	TotalPrice    float64 `json:"totalPrice"`
 }

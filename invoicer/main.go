@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/pdrm26/toll-calculator/types"
 )
@@ -33,13 +34,24 @@ func handleAggregate(service Aggregator) http.HandlerFunc {
 
 func handleInvoice(service Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		obuID := r.URL.Query().Get("obu")
-		fmt.Println(len(obuID))
-		if len(obuID) == 0 {
+		obuParam := r.URL.Query().Get("obu")
+		if len(obuParam) == 0 {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "missing obu id"})
 			return
 		}
-		w.Write([]byte("return the invoice for an OBU"))
+
+		obuID, err := strconv.Atoi(obuParam)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid obu id"})
+			return
+		}
+
+		invoice, err := service.CalculateInvoice(obuID)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, http.StatusOK, invoice)
 	}
 }
 
