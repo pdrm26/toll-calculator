@@ -53,6 +53,7 @@ func (c *KafkaConsumer) readMessageLoop() {
 		msg, err := c.consumer.ReadMessage(-1)
 		if err != nil {
 			log.Println("Kafka consumer error: ", err)
+			return
 		}
 
 		var obu types.OBU
