@@ -31,9 +31,22 @@ func handleAggregate(service Aggregator) http.HandlerFunc {
 	}
 }
 
+func handleInvoice(service Aggregator) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		obuID := r.URL.Query().Get("obu")
+		fmt.Println(len(obuID))
+		if len(obuID) == 0 {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "missing obu id"})
+			return
+		}
+		w.Write([]byte("return the invoice for an OBU"))
+	}
+}
+
 func makeHTTPTransport(listenAddr string, service Aggregator) {
 	fmt.Println("HTTP transport is running on port", listenAddr)
 	http.HandleFunc("/aggregate", handleAggregate(service))
+	http.HandleFunc("/invoice", handleInvoice(service))
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
 
