@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,18 +10,18 @@ import (
 	"github.com/pdrm26/toll-calculator/types"
 )
 
-type Client struct {
+type HTTPClient struct {
 	Endpoint string
 }
 
-func NewClient(endpoint string) *Client {
-	return &Client{
+func NewHTTPClient(endpoint string) *HTTPClient {
+	return &HTTPClient{
 		Endpoint: endpoint,
 	}
 }
 
-func (c *Client) AggregateDistance(distance types.Distance) error {
-	distBytes, err := json.Marshal(distance)
+func (c *HTTPClient) Aggregate(ctx context.Context, r *types.AggregatorDistance) error {
+	distBytes, err := json.Marshal(r)
 	if err != nil {
 		return err
 	}

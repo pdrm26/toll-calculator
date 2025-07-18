@@ -9,8 +9,14 @@ import (
 func main() {
 	service := NewCalculatorService()
 	service = NewLogMiddleware(service)
-	client := client.NewClient("http://localhost:8000/aggregate")
-	kafkaConsumer, err := NewkafkaConsumer("obudata", service, client)
+
+	// httpClient := client.NewHTTPClient("localhost:8001")
+	grpcClient, err := client.NewGRPCClient("localhost:8001")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	kafkaConsumer, err := NewkafkaConsumer("obudata", service, grpcClient)
 	if err != nil {
 		log.Fatal(err)
 	}

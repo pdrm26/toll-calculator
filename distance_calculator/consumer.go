@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
@@ -16,10 +17,10 @@ type KafkaConsumer struct {
 	topic       string
 	isRunning   bool // A signal handler or similar could be used to set this to false to break the loop.
 	calcService CalculatorServicer
-	aggClient   *client.Client
+	aggClient   client.Client
 }
 
-func NewkafkaConsumer(kafkaTopic string, service CalculatorServicer, aggClient *client.Client) (*KafkaConsumer, error) {
+func NewkafkaConsumer(kafkaTopic string, service CalculatorServicer, aggClient client.Client) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
 		"group.id":          "myGroup",
@@ -66,8 +67,13 @@ func (c *KafkaConsumer) readMessageLoop() {
 			logrus.Errorf("distance calculation error: %s", err)
 		}
 
-		distance := types.Distance{OBUID: obu.ID, Timestamp: time.Now().UnixNano(), Value: dist}
-		if err := c.aggClient.AggregateDistance(distance); err != nil {
+		distance := &types.AggregatorDistance{
+			Obuid:         int64(obu.ID),
+			UnixTimestamp: time.Now().UnixNano(),
+			Value:         dist,
+		}
+
+		if err := c.aggClient.Aggregate(context.Background(), distance); err != nil {
 			logrus.Error("aggregate error: ", err)
 			continue
 		}
