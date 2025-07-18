@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package = "github.com/pdrm26/toll-calculator/types";
 
 service Aggregator {
-    rpc Aggregate(AggregatorDistance ) returns (None);
+    rpc Aggregate(AggregatorDistance) returns (None);
 }
 
 message None {}
