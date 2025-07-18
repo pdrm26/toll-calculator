@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/pdrm26/toll-calculator/types";
+
+service Aggregator {
+    rpc Aggregate(AggregatorDistance ) returns (None);
+}
+
+message None {}
+
+message AggregatorDistance {
+    int64 obuid  = 1;
+	int64 unix_timestamp = 2;
+    double value = 3;
+}
