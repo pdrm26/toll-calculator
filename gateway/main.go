@@ -6,6 +6,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/pdrm26/toll-calculator/invoicer/client"
 	"github.com/sirupsen/logrus"
@@ -17,7 +18,7 @@ func main() {
 	listenAddr := flag.String("listenAddr", ":6000", "the listen address of the http server")
 	aggregatorServiceAddr := flag.String("aggServiceAddr", "http://localhost:3000", "the listen address of the aggregator service")
 	flag.Parse()
-	client, _ := client.NewGRPCClient(*aggregatorServiceAddr)
+	client := client.NewHTTPClient(*aggregatorServiceAddr)
 	invoice := newInvoiceHandler(client)
 
 	http.HandleFunc("/invoice", makeAPIFunc(invoice.handleGetInvoice))
@@ -51,7 +52,7 @@ func makeAPIFunc(fn apiFunc) http.HandlerFunc {
 }
 
 func (i *invoiceHandler) handleGetInvoice(w http.ResponseWriter, r *http.Request) error {
-	invoice, err := i.client.GetInvoice(context.Background(), 10)
+	invoice, err := i.client.GetInvoice(context.Background(), 8978773209462795273)
 	if err != nil {
 		return err
 	}
