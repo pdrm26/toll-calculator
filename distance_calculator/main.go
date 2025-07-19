@@ -6,12 +6,16 @@ import (
 	"github.com/pdrm26/toll-calculator/invoicer/client"
 )
 
+const (
+	aggregatorEndpoint = "localhost:3001"
+)
+
 func main() {
 	service := NewCalculatorService()
 	service = NewLogMiddleware(service)
 
-	// httpClient := client.NewHTTPClient("localhost:8001")
-	grpcClient, err := client.NewGRPCClient("localhost:8001")
+	// httpClient := client.NewHTTPClient(aggregatorEndpoint)
+	grpcClient, err := client.NewGRPCClient(aggregatorEndpoint)
 	if err != nil {
 		log.Fatal(err)
 	}

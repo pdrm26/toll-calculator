@@ -15,7 +15,7 @@ import (
 
 const sendInterval = time.Second
 
-var addr = flag.String("addr", "localhost:3000", "http service address")
+var addr = flag.String("addr", "localhost:30000", "http service address")
 
 func generateOBUID() int {
 	return rand.Intn(math.MaxInt)

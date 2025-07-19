@@ -14,13 +14,13 @@ import (
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
 
 func main() {
-	listenAddr := flag.String("listenAddr", ":8080", "the listen address of the http server")
+	listenAddr := flag.String("listenAddr", ":6000", "the listen address of the http server")
+	aggregatorServiceAddr := flag.String("aggServiceAddr", "http://localhost:3000", "the listen address of the aggregator service")
 	flag.Parse()
-
-	client := client.NewHTTPClient("localhost:8000")
+	client, _ := client.NewGRPCClient(*aggregatorServiceAddr)
 	invoice := newInvoiceHandler(client)
-	http.HandleFunc("/invoice", makeAPIFunc(invoice.handleGetInvoice))
 
+	http.HandleFunc("/invoice", makeAPIFunc(invoice.handleGetInvoice))
 	logrus.Infof("gateway HTTP server is up and running on port %s", *listenAddr)
 	log.Fatal(http.ListenAndServe(*listenAddr, nil))
 

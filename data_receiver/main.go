@@ -66,5 +66,5 @@ func main() {
 		log.Fatal(err)
 	}
 	http.HandleFunc("/ws", rec.handleWS)
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Fatal(http.ListenAndServe(":30000", nil))
 }
