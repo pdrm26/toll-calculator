@@ -44,7 +44,7 @@ func (c *HTTPClient) Aggregate(ctx context.Context, r *types.AggregatorDistance)
 	return nil
 }
 
-func (h *HTTPClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
+func (c *HTTPClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
 	invoiceBody := &types.GetInvoiceRequets{
 		Obuid: int64(obuID),
 	}
@@ -54,7 +54,8 @@ func (h *HTTPClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice,
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", h.Endpoint, bytes.NewReader(b))
+	endpoint := fmt.Sprintf("%s/%s?obu=%d", c.Endpoint, "invoice", obuID)
+	req, err := http.NewRequest("POST", endpoint, bytes.NewReader(b))
 	if err != nil {
 		return nil, err
 	}
