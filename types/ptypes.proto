@@ -6,6 +6,10 @@ service Aggregator {
     rpc Aggregate(AggregatorDistance) returns (None);
 }
 
+message GetInvoiceRequets {
+    int64 obuid = 1;
+}
+
 message None {}
 
 message AggregatorDistance {

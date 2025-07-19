@@ -21,6 +21,50 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type GetInvoiceRequets struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Obuid         int64                  `protobuf:"varint,1,opt,name=obuid,proto3" json:"obuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInvoiceRequets) Reset() {
+	*x = GetInvoiceRequets{}
+	mi := &file_types_ptypes_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInvoiceRequets) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInvoiceRequets) ProtoMessage() {}
+
+func (x *GetInvoiceRequets) ProtoReflect() protoreflect.Message {
+	mi := &file_types_ptypes_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInvoiceRequets.ProtoReflect.Descriptor instead.
+func (*GetInvoiceRequets) Descriptor() ([]byte, []int) {
+	return file_types_ptypes_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetInvoiceRequets) GetObuid() int64 {
+	if x != nil {
+		return x.Obuid
+	}
+	return 0
+}
+
 type None struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -29,7 +73,7 @@ type None struct {
 
 func (x *None) Reset() {
 	*x = None{}
-	mi := &file_types_ptypes_proto_msgTypes[0]
+	mi := &file_types_ptypes_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -41,7 +85,7 @@ func (x *None) String() string {
 func (*None) ProtoMessage() {}
 
 func (x *None) ProtoReflect() protoreflect.Message {
-	mi := &file_types_ptypes_proto_msgTypes[0]
+	mi := &file_types_ptypes_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -54,7 +98,7 @@ func (x *None) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use None.ProtoReflect.Descriptor instead.
 func (*None) Descriptor() ([]byte, []int) {
-	return file_types_ptypes_proto_rawDescGZIP(), []int{0}
+	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
 }
 
 type AggregatorDistance struct {
@@ -68,7 +112,7 @@ type AggregatorDistance struct {
 
 func (x *AggregatorDistance) Reset() {
 	*x = AggregatorDistance{}
-	mi := &file_types_ptypes_proto_msgTypes[1]
+	mi := &file_types_ptypes_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -80,7 +124,7 @@ func (x *AggregatorDistance) String() string {
 func (*AggregatorDistance) ProtoMessage() {}
 
 func (x *AggregatorDistance) ProtoReflect() protoreflect.Message {
-	mi := &file_types_ptypes_proto_msgTypes[1]
+	mi := &file_types_ptypes_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -93,7 +137,7 @@ func (x *AggregatorDistance) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AggregatorDistance.ProtoReflect.Descriptor instead.
 func (*AggregatorDistance) Descriptor() ([]byte, []int) {
-	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
+	return file_types_ptypes_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AggregatorDistance) GetObuid() int64 {
@@ -121,7 +165,9 @@ var File_types_ptypes_proto protoreflect.FileDescriptor
 
 const file_types_ptypes_proto_rawDesc = "" +
 	"\n" +
-	"\x12types/ptypes.proto\"\x06\n" +
+	"\x12types/ptypes.proto\")\n" +
+	"\x11GetInvoiceRequets\x12\x14\n" +
+	"\x05obuid\x18\x01 \x01(\x03R\x05obuid\"\x06\n" +
 	"\x04None\"g\n" +
 	"\x12AggregatorDistance\x12\x14\n" +
 	"\x05obuid\x18\x01 \x01(\x03R\x05obuid\x12%\n" +
@@ -143,14 +189,15 @@ func file_types_ptypes_proto_rawDescGZIP() []byte {
 	return file_types_ptypes_proto_rawDescData
 }
 
-var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_types_ptypes_proto_goTypes = []any{
-	(*None)(nil),               // 0: None
-	(*AggregatorDistance)(nil), // 1: AggregatorDistance
+	(*GetInvoiceRequets)(nil),  // 0: GetInvoiceRequets
+	(*None)(nil),               // 1: None
+	(*AggregatorDistance)(nil), // 2: AggregatorDistance
 }
 var file_types_ptypes_proto_depIdxs = []int32{
-	1, // 0: Aggregator.Aggregate:input_type -> AggregatorDistance
-	0, // 1: Aggregator.Aggregate:output_type -> None
+	2, // 0: Aggregator.Aggregate:input_type -> AggregatorDistance
+	1, // 1: Aggregator.Aggregate:output_type -> None
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -169,7 +216,7 @@ func file_types_ptypes_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_ptypes_proto_rawDesc), len(file_types_ptypes_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
