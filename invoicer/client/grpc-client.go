@@ -31,3 +31,11 @@ func (c *GRPCClient) Aggregate(ctx context.Context, req *types.AggregatorDistanc
 	_, err := c.Client.Aggregate(ctx, req)
 	return err
 }
+
+func (c *GRPCClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
+	return &types.Invoice{
+		OBUID:         obuID,
+		TotalDistance: 1242098.124,
+		TotalPrice:    10.10001294,
+	}, nil
+}

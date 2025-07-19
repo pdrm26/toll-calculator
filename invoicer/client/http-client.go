@@ -35,10 +35,45 @@ func (c *HTTPClient) Aggregate(ctx context.Context, r *types.AggregatorDistance)
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("error status %d", res.StatusCode)
 	}
 
 	return nil
+}
+
+func (h *HTTPClient) GetInvoice(ctx context.Context, obuID int) (*types.Invoice, error) {
+	invoiceBody := &types.GetInvoiceRequets{
+		Obuid: int64(obuID),
+	}
+
+	b, err := json.Marshal(invoiceBody)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", h.Endpoint, bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error status %d", res.StatusCode)
+	}
+
+	var inv types.Invoice
+	if err := json.NewDecoder(res.Body).Decode(&inv); err != nil {
+		return nil, err
+	}
+
+	return &inv, err
+
 }
