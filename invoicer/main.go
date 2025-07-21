@@ -84,8 +84,8 @@ func makeHTTPTransport(listenAddr string, service Aggregator) {
 }
 
 func main() {
-	httpListenAddr := flag.String("httpListenAddr", ":3000", "http server listen address")
-	grpcListenAddr := flag.String("grpcListenAddr", ":3001", "http server listen address")
+	httpListenAddr := flag.String("httpListenAddr", ":4000", "http server listen address")
+	grpcListenAddr := flag.String("grpcListenAddr", ":4001", "http server listen address")
 	flag.Parse()
 
 	store := NewMemoryStore()
