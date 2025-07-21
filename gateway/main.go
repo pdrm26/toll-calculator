@@ -6,19 +6,29 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/pdrm26/toll-calculator/invoicer/client"
 	"github.com/sirupsen/logrus"
 )
 
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
 
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
+
 func main() {
 	listenAddr := flag.String("listenAddr", ":6000", "the listen address of the http server")
-	aggregatorServiceAddr := flag.String("aggServiceAddr", "http://localhost:4000", "the listen address of the aggregator service")
 	flag.Parse()
-	client := client.NewHTTPClient(*aggregatorServiceAddr)
+
+	aggregatorServiceAddr := os.Getenv("AGG_HTTP_ENDPOINT")
+	client := client.NewHTTPClient(aggregatorServiceAddr)
 	invoice := newInvoiceHandler(client)
 
 	http.HandleFunc("/invoice", makeAPIFunc(invoice.handleGetInvoice))
