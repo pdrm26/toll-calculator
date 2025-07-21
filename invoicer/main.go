@@ -90,6 +90,7 @@ func main() {
 
 	store := NewMemoryStore()
 	service := NewInvoiceAggregator(store)
+	service = NewMetricMiddleware(service)
 	service = NewLogMiddleware(service)
 
 	go makeGRPCTransport(*grpcListenAddr, service)
