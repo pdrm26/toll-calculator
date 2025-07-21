@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	aggregatorEndpoint = "localhost:3001"
+	aggregatorEndpoint = "localhost:4001"
 )
 
 func main() {
