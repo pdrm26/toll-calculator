@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 	"github.com/pdrm26/toll-calculator/types"
@@ -15,56 +14,29 @@ import (
 	"google.golang.org/grpc"
 )
 
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
+
+func main() {
+	httpListenAddr := os.Getenv("AGG_HTTP_ENDPOINT")
+	grpcListenAddr := os.Getenv("AGG_GRPC_ENDPOINT")
+	store := makeStore()
+	service := NewInvoiceAggregator(store)
+	service = NewMetricMiddleware(service)
+	service = NewLogMiddleware(service)
+
+	go makeGRPCTransport(grpcListenAddr, service)
+	makeHTTPTransport(httpListenAddr, service)
+}
+
 func writeJSON(w http.ResponseWriter, status int, res any) error {
 	w.WriteHeader(status)
 	w.Header().Add("Content-Type", "application/json")
 	return json.NewEncoder(w).Encode(res)
-}
-
-func handleAggregate(service Aggregator) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "method not supported"})
-			return
-		}
-		var distance types.Distance
-		if err := json.NewDecoder(r.Body).Decode(&distance); err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
-			return
-		}
-
-		if err := service.AggregateDistance(distance); err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-			return
-		}
-	}
-}
-
-func handleInvoice(service Aggregator) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "method not supported"})
-			return
-		}
-		obuParam := r.URL.Query().Get("obu")
-		if len(obuParam) == 0 {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "missing obu id"})
-			return
-		}
-
-		obuID, err := strconv.Atoi(obuParam)
-		if err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid obu id"})
-			return
-		}
-
-		invoice, err := service.CalculateInvoice(obuID)
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-			return
-		}
-		writeJSON(w, http.StatusOK, invoice)
-	}
 }
 
 func makeGRPCTransport(listenAddr string, service Aggregator) error {
@@ -92,13 +64,6 @@ func makeHTTPTransport(listenAddr string, service Aggregator) {
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-}
-
 func makeStore() Storer {
 	storeType := os.Getenv("AGG_STORE_TYPE")
 	switch storeType {
@@ -108,16 +73,4 @@ func makeStore() Storer {
 		log.Fatalf("invalid memory type: %s", storeType)
 		return nil
 	}
-}
-
-func main() {
-	httpListenAddr := os.Getenv("AGG_HTTP_ENDPOINT")
-	grpcListenAddr := os.Getenv("AGG_GRPC_ENDPOINT")
-	store := makeStore()
-	service := NewInvoiceAggregator(store)
-	service = NewMetricMiddleware(service)
-	service = NewLogMiddleware(service)
-
-	go makeGRPCTransport(grpcListenAddr, service)
-	makeHTTPTransport(httpListenAddr, service)
 }
