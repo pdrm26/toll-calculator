@@ -91,10 +91,21 @@ func init() {
 	}
 }
 
+func makeStore() Storer {
+	storeType := os.Getenv("AGG_STORE_TYPE")
+	switch storeType {
+	case "memory":
+		return NewMemoryStore()
+	default:
+		log.Fatalf("invalid memory type: %s", storeType)
+		return nil
+	}
+}
+
 func main() {
 	httpListenAddr := os.Getenv("AGG_HTTP_ENDPOINT")
 	grpcListenAddr := os.Getenv("AGG_GRPC_ENDPOINT")
-	store := NewMemoryStore()
+	store := makeStore()
 	service := NewInvoiceAggregator(store)
 	service = NewMetricMiddleware(service)
 	service = NewLogMiddleware(service)
