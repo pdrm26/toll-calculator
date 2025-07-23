@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -33,12 +32,6 @@ func main() {
 	makeHTTPTransport(httpListenAddr, service)
 }
 
-func writeJSON(w http.ResponseWriter, status int, res any) error {
-	w.WriteHeader(status)
-	w.Header().Add("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(res)
-}
-
 func makeGRPCTransport(listenAddr string, service Aggregator) error {
 	lis, err := net.Listen("tcp", listenAddr)
 	if err != nil {
@@ -62,15 +55,4 @@ func makeHTTPTransport(listenAddr string, service Aggregator) {
 	http.HandleFunc("/invoice", handleInvoice(service))
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
-}
-
-func makeStore() Storer {
-	storeType := os.Getenv("AGG_STORE_TYPE")
-	switch storeType {
-	case "memory":
-		return NewMemoryStore()
-	default:
-		log.Fatalf("invalid memory type: %s", storeType)
-		return nil
-	}
 }
