@@ -23,6 +23,10 @@ func writeJSON(w http.ResponseWriter, status int, res any) error {
 
 func handleAggregate(service Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "method not supported"})
+			return
+		}
 		var distance types.Distance
 		if err := json.NewDecoder(r.Body).Decode(&distance); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -38,6 +42,10 @@ func handleAggregate(service Aggregator) http.HandlerFunc {
 
 func handleInvoice(service Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "method not supported"})
+			return
+		}
 		obuParam := r.URL.Query().Get("obu")
 		if len(obuParam) == 0 {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "missing obu id"})
