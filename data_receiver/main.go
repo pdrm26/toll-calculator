@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 	"github.com/pdrm26/toll-calculator/types"
 )
 
@@ -15,6 +17,22 @@ type OBUReceiver struct {
 	msgch    chan types.OBU
 	conn     *websocket.Conn
 	producer DataProducer
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
+
+func main() {
+	rec, err := NewOBUReceiver()
+	if err != nil {
+		log.Fatal(err)
+	}
+	http.HandleFunc("/ws", rec.handleWS)
+	log.Fatal(http.ListenAndServe(os.Getenv("DATA_RECEIVER_ENDPOINT"), nil))
 }
 
 func NewOBUReceiver() (*OBUReceiver, error) {
@@ -58,13 +76,4 @@ func (or *OBUReceiver) handleWS(w http.ResponseWriter, r *http.Request) {
 
 	or.conn = conn
 	or.wsReceiveLoop()
-}
-
-func main() {
-	rec, err := NewOBUReceiver()
-	if err != nil {
-		log.Fatal(err)
-	}
-	http.HandleFunc("/ws", rec.handleWS)
-	log.Fatal(http.ListenAndServe(":30000", nil))
 }
