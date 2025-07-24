@@ -36,7 +36,7 @@ func main() {
 }
 
 func NewOBUReceiver() (*OBUReceiver, error) {
-	p, err := NewKafkaProducer("obudata")
+	p, err := NewKafkaProducer(os.Getenv("KAFKA_TOPIC_NAME"))
 	if err != nil {
 		return nil, err
 	}

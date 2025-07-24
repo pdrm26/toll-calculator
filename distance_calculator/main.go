@@ -32,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	kafkaConsumer, err := NewkafkaConsumer("obudata", service, grpcClient)
+	kafkaConsumer, err := NewkafkaConsumer(os.Getenv("KAFKA_TOPIC_NAME"), service, grpcClient)
 	if err != nil {
 		log.Fatal(err)
 	}
