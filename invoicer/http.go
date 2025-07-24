@@ -2,11 +2,47 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/pdrm26/toll-calculator/types"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
+
+type HTTPMetricHandler struct {
+	reqCounter prometheus.Counter
+	reqLatency prometheus.Histogram
+}
+
+func NewHTTPMetricHandler(reqName string) *HTTPMetricHandler {
+	reqCounter := promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: fmt.Sprintf("http_%s_requst_counter", reqName),
+		Name:      "aggregator",
+	})
+	reqLatency := promauto.NewHistogram(prometheus.HistogramOpts{
+		Namespace: fmt.Sprintf("http_%s_requst_latency", reqName),
+		Name:      "aggregator",
+		Buckets:   []float64{0.1, 0.5, 1},
+	})
+	return &HTTPMetricHandler{
+		reqCounter: reqCounter,
+		reqLatency: reqLatency,
+	}
+}
+
+func (m *HTTPMetricHandler) instrument(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer func(start time.Time) {
+			m.reqLatency.Observe(float64(time.Since(start).Seconds()))
+		}(time.Now())
+		m.reqCounter.Inc()
+		h(w, r)
+	}
+
+}
 
 func handleAggregate(service Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
