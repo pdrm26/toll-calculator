@@ -54,8 +54,8 @@ func makeHTTPTransport(listenAddr string, service Aggregator) {
 
 	aggMetricsHandler := NewHTTPMetricHandler("aggregate")
 	invoiceMetricsHandler := NewHTTPMetricHandler("invoice")
-	http.HandleFunc("/aggregate", aggMetricsHandler.instrument(handleAggregate(service)))
-	http.HandleFunc("/invoice", invoiceMetricsHandler.instrument(handleInvoice(service)))
+	http.HandleFunc("/aggregate", makeHTTPHandlerFunc(aggMetricsHandler.instrument(handleAggregate(service))))
+	http.HandleFunc("/invoice", makeHTTPHandlerFunc(invoiceMetricsHandler.instrument(handleInvoice(service))))
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
