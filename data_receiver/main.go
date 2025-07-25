@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 	"github.com/pdrm26/toll-calculator/types"
@@ -60,6 +61,7 @@ func (or *OBUReceiver) wsReceiveLoop() {
 			log.Println("Read error:", err)
 			break
 		}
+		obu.RequestID = uuid.New().String()
 		if err := or.produceData(obu); err != nil {
 			fmt.Println("kafka produce error:", err)
 		}
