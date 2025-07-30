@@ -24,7 +24,7 @@ func makeAggregateEndpoint(s aggservice.Service) endpoint.Endpoint {
 func makeInvoiceEndpoint(s aggservice.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(InvoiceRequest)
-		v, err := s.Calculate(ctx, req.OBUID)
+		v, err := s.Invoice(ctx, req.OBUID)
 		return InvoiceResponse{Invoice: *v, Err: err}, nil
 	}
 }

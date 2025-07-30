@@ -22,7 +22,7 @@ func (l loggingMiddleware) Aggregate(ctx context.Context, distance types.Distanc
 	return nil
 }
 
-func (l loggingMiddleware) Calculate(ctx context.Context, id int) (invoice *types.Invoice, err error) {
+func (l loggingMiddleware) Invoice(ctx context.Context, id int) (invoice *types.Invoice, err error) {
 	return nil, nil
 }
 
@@ -41,6 +41,6 @@ func (imw instrumentingMiddleware) Aggregate(ctx context.Context, distance types
 	return nil
 }
 
-func (imw instrumentingMiddleware) Calculate(ctx context.Context, id int) (invoice *types.Invoice, err error) {
+func (imw instrumentingMiddleware) Invoice(ctx context.Context, id int) (invoice *types.Invoice, err error) {
 	return nil, nil
 }

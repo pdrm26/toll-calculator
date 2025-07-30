@@ -10,7 +10,7 @@ const basePrice = 1.12
 
 type Service interface {
 	Aggregate(context.Context, types.Distance) error
-	Calculate(context.Context, int) (*types.Invoice, error)
+	Invoice(context.Context, int) (*types.Invoice, error)
 }
 
 type basicService struct {
@@ -25,7 +25,7 @@ func (s basicService) Aggregate(ctx context.Context, distance types.Distance) er
 	return s.store.Insert(distance)
 }
 
-func (s basicService) Calculate(ctx context.Context, obuID int) (*types.Invoice, error) {
+func (s basicService) Invoice(ctx context.Context, obuID int) (*types.Invoice, error) {
 	dist, err := s.store.Get(obuID)
 	if err != nil {
 		return nil, err
