@@ -13,6 +13,23 @@ type Set struct {
 	InvoiceEndpoint   endpoint.Endpoint
 }
 
+func New(svc aggservice.Service) Set {
+	var aggregateEndpoint endpoint.Endpoint
+	{
+		aggregateEndpoint = makeAggregateEndpoint(svc)
+
+	}
+	var invoiceEndpoint endpoint.Endpoint
+	{
+		invoiceEndpoint = makeInvoiceEndpoint(svc)
+	}
+	return Set{
+		AggregateEndpoint: aggregateEndpoint,
+		InvoiceEndpoint:   invoiceEndpoint,
+	}
+
+}
+
 func makeAggregateEndpoint(s aggservice.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(AggregateRequest)
