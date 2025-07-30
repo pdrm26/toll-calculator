@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/pdrm26/toll-calculator/go-kit-aggregator-service/aggservice"
+	"github.com/pdrm26/toll-calculator/go-kit-aggregator-service/aggsvc/aggservice"
 	"github.com/pdrm26/toll-calculator/types"
 )
 
@@ -12,18 +12,6 @@ type Set struct {
 	AggregateEndpoint endpoint.Endpoint
 	InvoiceEndpoint   endpoint.Endpoint
 }
-
-// func New(svc aggservice.Service) Set {
-// 	var aggregateEndpoint endpoint.Endpoint
-// 	{
-// 		aggregateEndpoint = makeAggregateEndpoint()
-// 		aggregateEndpoint = newlogg
-// 		aggregateEndpoint = makeAggregateEndpoint()
-// 	}
-// 	return Set{
-// 		AggregateEndpoint: aggregateEndpoint,
-// 	}
-// }
 
 func makeAggregateEndpoint(s aggservice.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
