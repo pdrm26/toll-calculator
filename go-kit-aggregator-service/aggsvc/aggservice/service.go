@@ -39,7 +39,7 @@ func (s basicService) Invoice(ctx context.Context, obuID int) (*types.Invoice, e
 	return invoce, nil
 }
 
-func NewAggregator() Service {
+func New() Service {
 	var svc Service
 	{
 		svc = newBasicService(NewMemoryStore())
