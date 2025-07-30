@@ -13,7 +13,7 @@ import (
 	"github.com/pdrm26/toll-calculator/go-kit-aggregator-service/aggsvc/aggendpoint"
 )
 
-func newHTTPHandler(endpoints aggendpoint.Set, logger log.Logger) http.Handler {
+func NewHTTPHandler(endpoints aggendpoint.Set, logger log.Logger) http.Handler {
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorEncoder(errorEncoder),
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
