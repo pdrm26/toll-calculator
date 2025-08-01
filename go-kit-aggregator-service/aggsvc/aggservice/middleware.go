@@ -19,11 +19,11 @@ func newLoggingMiddleware() Middleware {
 }
 
 func (l loggingMiddleware) Aggregate(ctx context.Context, distance types.Distance) (err error) {
-	return nil
+	return l.next.Aggregate(ctx, distance)
 }
 
 func (l loggingMiddleware) Invoice(ctx context.Context, id int) (invoice *types.Invoice, err error) {
-	return nil, nil
+	return l.next.Invoice(ctx, id)
 }
 
 // Instrumentation middleware
@@ -38,9 +38,9 @@ func newInstrumentingMiddleware() Middleware {
 }
 
 func (imw instrumentingMiddleware) Aggregate(ctx context.Context, distance types.Distance) (err error) {
-	return nil
+	return imw.next.Aggregate(ctx, distance)
 }
 
 func (imw instrumentingMiddleware) Invoice(ctx context.Context, id int) (invoice *types.Invoice, err error) {
-	return nil, nil
+	return imw.next.Invoice(ctx, id)
 }
